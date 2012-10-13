@@ -1,5 +1,5 @@
 #
-# TODO
+# Simple File Concat module
 #
 
 require 'puppet/type/file'
@@ -9,7 +9,7 @@ require 'puppet/type/file/mode'
 require 'puppet/util/checksums'
 
 Puppet::Type.newtype(:file_concat) do
-  @doc = "TODO"
+  @doc = "Simple File Concat module"
 
   ensurable
 
@@ -23,20 +23,34 @@ Puppet::Type.newtype(:file_concat) do
     super
   end
 
-  newparam(:path, :namevar => true) do
-    desc "An arbitrary tag for your own reference; the name of the message."
+  newparam(:name) do
+    desc "Resource name"
+  end
+
+  newparam(:tag) do
+    desc "Tag reference to collect all file_fragment's with the same tag"
+  end
+
+  newparam(:path) do
+    desc "The output file"
+    defaultto do
+      resource.value(:name)
+    end
   end
 
   newproperty(:owner, :parent => Puppet::Type::File::Owner) do
     desc "Desired file owner."
+    defaultto 'root'
   end
 
   newproperty(:group, :parent => Puppet::Type::File::Group) do
     desc "Desired file group."
+    defaultto 'root'
   end
 
   newproperty(:mode, :parent => Puppet::Type::File::Mode) do
     desc "Desired file mode."
+    defaultto '0644'
   end
 
   newproperty(:content) do
@@ -84,7 +98,7 @@ Puppet::Type.newtype(:file_concat) do
     content_fragments = []
 
     catalog.resources.select do |r|
-      r.is_a?(Puppet::Type.type(:file_fragment)) && r[:path] == self[:path]
+      r.is_a?(Puppet::Type.type(:file_fragment)) && r[:tag] == self[:tag]
     end.each do |r|
       content_fragments << [
         "#{r[:order]}_#{r[:name]}", # sort key as in old concat module

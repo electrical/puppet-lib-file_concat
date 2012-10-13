@@ -1,40 +1,28 @@
 #
-# TODO
+# File Fragment
 #
-module Puppet
-  newtype(:file_fragment) do
-    @doc = "TODO"
 
-    newparam(:name, :namevar => true) do
-      desc "TODO"
-    end
+Puppet::Type.newtype(:file_fragment) do
+  @doc = "Create a file fragment to be used by file_concat"
 
-    newparam(:target) do
-      desc "Deprecated. Use *path* instead."
-    end
+  newparam(:name, :namevar => true) do
+    desc "Unique name"
+  end
 
-    newparam(:path) do
-      desc "TODO"
+  newparam(:content) do
+    desc "Content"
+  end
 
-      defaultto do
-	resource.value(:target)
-      end
-    end
-
-    newparam(:content) do
-      desc "TODO"
-    end
-
-    newparam(:order) do
-      desc "TODO"
-
-      defaultto '10'
-
-      validate do |val|
-        fail "only integers > 0 are allowed and not '#{val}'" if val !~ /^\d+$/
-      end
-
+  newparam(:order) do
+    desc "Order"
+    defaultto '10'
+    validate do |val|
+      fail "only integers > 0 are allowed and not '#{val}'" if val !~ /^\d+$/
     end
   end
-end
 
+  newparam(:tag) do
+    desc "Tag name to be used by file_concat to collect all file_fragments by tag name"
+  end
+
+end

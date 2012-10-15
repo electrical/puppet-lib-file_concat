@@ -1,7 +1,3 @@
-#
-# Simple File Concat module
-#
-
 require 'puppet/type/file'
 require 'puppet/type/file/owner'
 require 'puppet/type/file/group'
@@ -9,7 +5,20 @@ require 'puppet/type/file/mode'
 require 'puppet/util/checksums'
 
 Puppet::Type.newtype(:file_concat) do
-  @doc = "Simple File Concat module"
+  @doc = "Gets all the file fragments and puts these into the target file.
+    This will mostly be used with exported resources.
+
+    example:
+      File_fragment <<| tag == 'unique_tag' |>>
+
+      file_concat { '/tmp/file:
+        tag   => 'unique_tag', # Mandatory
+        path  => '/tmp/file', # Optional. If given it overrides the resource name
+        owner => 'root', # Optional. Default to root
+        group => 'root', # Optional. Default to root
+        mode  => '0644'  # Optional. Default to 0644
+      }
+  "
 
   ensurable
 

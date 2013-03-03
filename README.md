@@ -11,10 +11,11 @@ Creates a file fragment to be collected by file_concat based on the tag.
 Example with exported resource:
 
     @@file_fragment { "uniqe_name_${::fqdn}":
-      tag => 'unique_tag',                # Mandatory
-      order => 10,                        # Optional. Default to 10
+      tag     => 'unique_tag',            # Mandatory
+      order   => 10,                      # Optional. Default to 10
       content => 'some content'           # OR
-      content => template('template.erb')
+      content => template('template.erb') # OR
+      source  => 'puppet:///path/to/file'
     }
 
 ### file_concat

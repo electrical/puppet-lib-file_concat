@@ -3,6 +3,7 @@ require 'puppet/type/file/owner'
 require 'puppet/type/file/group'
 require 'puppet/type/file/mode'
 require 'puppet/util/checksums'
+require 'puppet/type/file/source'
 
 Puppet::Type.newtype(:file_concat) do
   @doc = "Gets all the file fragments and puts these into the target file.
@@ -32,7 +33,7 @@ Puppet::Type.newtype(:file_concat) do
     super
   end
 
-  newparam(:name) do
+  newparam(:name, :namevar => true) do
     desc "Resource name"
   end
 
@@ -109,9 +110,17 @@ Puppet::Type.newtype(:file_concat) do
     catalog.resources.select do |r|
       r.is_a?(Puppet::Type.type(:file_fragment)) && r[:tag] == self[:tag]
     end.each do |r|
+
+     if r[:content].nil? == false
+       fragment_content = r[:content]
+     elsif r[:source].nil? ==false
+       tmp = Puppet::FileServing::Content.indirection.find(r[:source], :environment => catalog.environment)
+       fragment_content = tmp.content
+     end
+
       content_fragments << [
         "#{r[:order]}_#{r[:name]}", # sort key as in old concat module
-        r[:content]
+         fragment_content
       ]
     end
 
@@ -148,4 +157,3 @@ Puppet::Type.newtype(:file_concat) do
     end
   end
 end
-

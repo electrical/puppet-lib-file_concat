@@ -1,5 +1,5 @@
 name    'ispavailability-file_concat'
-version '0.0.1'
+version '0.0.2'
 source 'https://github.com/electrical/puppet-lib-file_concat'
 author 'ispavailability'
 license 'Apache License, Version 2.0'

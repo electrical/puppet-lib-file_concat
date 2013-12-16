@@ -30,7 +30,7 @@ Puppet::Type.newtype(:file_fragment) do
     desc "Order"
     defaultto '10'
     validate do |val|
-      fail Puppet::ParseError, "only integers > 0 are allowed and not '#{val}'" if val !~ /^\d+$/
+      fail Puppet::ParseError, "only integers > 0 are allowed and not '#{val}'" if val.to_s !~ /^\d+$/
     end
   end
 

@@ -119,14 +119,19 @@ Puppet::Type.newtype(:file_concat) do
      end
 
       content_fragments << [
-        "#{r[:order]}_#{r[:name]}", # sort key as in old concat module
-         fragment_content
+        "#{r[:order]}___#{r[:name]}", fragment_content
       ]
     end
 
-    content_fragments.sort { |l,r| l[0] <=> r[0] }.each do |cf|
-      @generated_content += cf[1]
+    sorted = fragments.sort do |a, b|
+      def decompound(d)
+        d.split('___').map { |d| d =~ /^\d+$/ ? d.to_i : d }
+      end
+
+      decompound(a[0]) <=> decompound(b[0])
     end
+
+    @generated_content = sorted.map { |cf| cf[1] }.join
 
     @generated_content
   end

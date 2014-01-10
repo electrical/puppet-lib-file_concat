@@ -123,7 +123,7 @@ Puppet::Type.newtype(:file_concat) do
       ]
     end
 
-    sorted = fragments.sort do |a, b|
+    sorted = content_fragments.sort do |a, b|
       def decompound(d)
         d.split('___').map { |d| d =~ /^\d+$/ ? d.to_i : d }
       end

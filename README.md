@@ -27,7 +27,7 @@ example:
     
     File_fragment <<| tag == 'unique_tag' |>>
 
-    file_concat { '/tmp/file:
+    file_concat { '/tmp/file':
       tag   => 'unique_tag', # Mandatory
       path  => '/tmp/file',  # Optional. If given it overrides the resource name
       owner => 'root',       # Optional. Default to root

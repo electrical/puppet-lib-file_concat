@@ -19,8 +19,11 @@ Puppet::Type.newtype(:file_concat) do
         mode  => '0644'  # Optional. Default to 0644
       }
   "
+  ensurable do
+    defaultvalues
 
-  ensurable
+    defaultto { :present }
+  end
 
   # the file/posix provider will check for the :links property
   # which does not exist

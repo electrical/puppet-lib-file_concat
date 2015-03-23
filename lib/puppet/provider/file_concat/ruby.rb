@@ -1,11 +1,10 @@
 Puppet::Type.type(:file_concat).provide(:ruby, :parent => Puppet::Type.type(:file).provider(:posix)) do
-
   def exists?
     resource.stat ? true : false
   end
 
   def create
-    # FIXME security issue because the file won't necessarily
+    # FIXME: security issue because the file won't necessarily
     # be created with the specified mode/owner/group if they
     # are specified
     send("content=", resource.should_content)
@@ -17,11 +16,15 @@ Puppet::Type.type(:file_concat).provide(:ruby, :parent => Puppet::Type.type(:fil
   end
 
   def content
-    actual = File.read(resource[:path]) rescue nil
+    begin
+      actual = File.read(resource[:path])
+    rescue
+      nil
+    end
     (actual == resource.should_content) ? resource.no_content : actual
   end
-#
-  def content=(value)
+
+  def content=(*)
     File.open(resource[:path], 'w') do |fh|
       fh.print resource.should_content
     end

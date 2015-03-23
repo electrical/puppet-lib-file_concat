@@ -93,7 +93,6 @@ describe "File Concat" do
     describe "single fragment" do
       it 'should run successfully' do
         pp = "
-              $var = 'something'
               file_fragment { 'fragment_1': source => 'puppet:///modules/another/file1', tag => 'mytag' }
               file_concat { 'myfile': tag => 'mytag', path => '/tmp/concat' }
              "
@@ -111,7 +110,6 @@ describe "File Concat" do
     describe "multiple fragments" do
       it 'should run successfully' do
         pp = "
-              $var = 'something2'
               file_fragment { 'fragment_1': source => 'puppet:///modules/another/file1', tag => 'mytag' }
               file_fragment { 'fragment_2': source => 'puppet:///modules/another/file2', tag => 'mytag' }
               file_concat { 'myfile': tag => 'mytag', path => '/tmp/concat' }
@@ -126,6 +124,23 @@ describe "File Concat" do
         its(:content) { should match /contentfile1\ncontentfile2/ }
       end
 
+    end
+
+    describe "non existing fragment" do
+      it 'should run successfully' do
+        pp = "
+              file_fragment { 'fragment_1': source => 'puppet:///modules/another/file3', tag => 'mytag' }
+              file_concat { 'myfile': tag => 'mytag', path => '/tmp/concat' }
+             "
+        apply_manifest(pp, :catch_failures => true)
+        expect(apply_manifest(pp, :catch_failures => true).exit_code).to be_zero
+
+      end
+
+      describe file('/tmp/concat') do
+        it { should be_file }
+        its(:content) { should match // }
+      end
     end
    
   end

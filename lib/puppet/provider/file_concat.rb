@@ -1,4 +1,4 @@
-Puppet::Type.type(:file_concat).provide(:ruby, :parent => Puppet::Type.type(:file).provider(:posix)) do
+module Puppet::Provider::File_concat
   def exists?
     resource.stat ? true : false
   end
@@ -26,7 +26,7 @@ Puppet::Type.type(:file_concat).provide(:ruby, :parent => Puppet::Type.type(:fil
 
   def content=(*)
     File.open(resource[:path], 'w') do |fh|
-      fh.print resource.should_content
+      fh.write resource.should_content
     end
   end
 end

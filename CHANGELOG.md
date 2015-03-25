@@ -1,3 +1,20 @@
+##0.2.1 ( Mar 25, 2015 )
+
+###Summary
+Bugfix release
+
+####Features
+
+####Bugfixes
+* Fix a bug caused by some refactoring
+
+####Changes
+
+####Testing changes
+
+####Known bugs
+* Windows is not supported yet
+
 ##0.2.0 ( Mar 25, 2015 )
 
 ###Summary

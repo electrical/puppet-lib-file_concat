@@ -1,6 +1,6 @@
 {
   "name": "ispavailability-file_concat",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": "ispavailability",
   "summary": "Concatenates multiple files into 1",
   "license": "Apache 2.0",

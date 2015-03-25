@@ -74,7 +74,7 @@ Puppet::Type.newtype(:file_concat) do
       @resource.no_content
     end
 
-    validate do
+    validate do |val|
       fail "read-only attribute" unless @content_default
     end
 

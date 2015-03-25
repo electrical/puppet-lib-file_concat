@@ -1,7 +1,7 @@
 {
-  "name": "puppet-lib-file_concat",
+  "name": "ispavailability-file_concat",
   "version": "0.2.0",
-  "author": "electrical",
+  "author": "ispavailability",
   "summary": "Concatenates multiple files into 1",
   "license": "Apache 2.0",
   "source": "http://github.com/electrical/puppet-lib-file_concat",

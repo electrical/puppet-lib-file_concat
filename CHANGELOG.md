@@ -1,3 +1,19 @@
+##0.3.0 ( Mar 26, 2015 )
+
+###Summary
+This release adds windows support to the library.
+
+####Features
+* Added windows support to the library.
+
+####Bugfixes
+
+####Changes
+
+####Testing changes
+
+####Known bugs
+
 ##0.2.1 ( Mar 25, 2015 )
 
 ###Summary

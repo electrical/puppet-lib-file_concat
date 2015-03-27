@@ -145,4 +145,48 @@ describe "File Concat" do
    
   end
 
+  describe "file owner" do
+
+    describe "Using defaults" do
+      it 'should run successfully' do
+        pp = "
+              file_fragment { 'fragment_1': source => 'puppet:///modules/another/file1', tag => 'mytag' }
+              file_concat { 'myfile': tag => 'mytag', path => '/tmp/concat' }
+             "
+        apply_manifest(pp, :catch_failures => true)
+        expect(apply_manifest(pp, :catch_failures => true).exit_code).to be_zero
+
+      end
+
+      describe file('/tmp/concat') do
+        it { should be_file }
+        it { should be_owned_by 'root' }
+        it { should be_grouped_into 'root' }
+        it { should be_mode 644 }
+      end
+    end
+
+    describe "Using owner=nobody, group=nobody, mode=0755" do
+      it 'should run successfully' do
+        pp = "
+              group { 'nobody': ensure => 'present' }
+              user { 'nobody': ensure => 'present', groups => 'nobody'}
+              file_fragment { 'fragment_1': source => 'puppet:///modules/another/file1', tag => 'mytag' }
+              file_concat { 'myfile': tag => 'mytag', path => '/tmp/concat', owner => 'nobody', group => 'nobody', mode => 0755 }
+             "
+        apply_manifest(pp, :catch_failures => true)
+        expect(apply_manifest(pp, :catch_failures => true).exit_code).to be_zero
+
+      end
+
+      describe file('/tmp/concat') do
+        it { should be_file }
+        it { should be_owned_by 'nobody' }
+        it { should be_grouped_into 'nobody' }
+        it { should be_mode 755 }
+      end
+    end
+
+  end
+
 end

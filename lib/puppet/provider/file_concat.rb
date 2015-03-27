@@ -24,6 +24,18 @@ module Puppet::Provider::File_concat
     (actual == resource.should_content) ? resource.no_content : actual
   end
 
+  def backup
+    resource[:backup]
+  end
+
+  def replace
+    resource[:replace]
+  end
+
+  def validate_cmd
+    resource[:validate_cmd]
+  end
+
   def content=(*)
     File.open(resource[:path], 'w') do |fh|
       fh.write resource.should_content

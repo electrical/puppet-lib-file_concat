@@ -13,10 +13,11 @@ Puppet::Type.newtype(:file_concat) do
 
       file_concat { '/tmp/file:
         tag   => 'unique_tag', # Mandatory
-        path  => '/tmp/file', # Optional. If given it overrides the resource name
-        owner => 'root', # Optional. Default to root
-        group => 'root', # Optional. Default to root
-        mode  => '0644'  # Optional. Default to 0644
+        path  => '/tmp/file',  # Optional. If given it overrides the resource name
+        owner => 'root',       # Optional. Default to root
+        group => 'root',       # Optional. Default to root
+        mode  => '0644'        # Optional. Default to 0644
+        order => 'numeric'     # Optional, Default to 'numeric'
       }
   "
   ensurable do
@@ -93,6 +94,25 @@ Puppet::Type.newtype(:file_concat) do
     end
   end
 
+  newparam(:order) do
+    desc "Controls the ordering of fragments. Can be set to alphabetical or numeric."
+    defaultto 'numeric'
+  end
+
+  newparam(:backup) do
+    desc "Controls the filebucketing behavior of the final file and see File type reference for its use."
+    defaultto 'puppet'
+  end
+
+  newparam(:replace) do
+    desc "Whether to replace a file that already exists on the local system."
+    defaultto true
+  end
+
+  newparam(:validate_cmd) do
+    desc "Validates file."
+  end
+
   def no_content
     "\0PLEASE_MANAGE_THIS_WITH_FILE_CONCAT\0"
   end
@@ -110,12 +130,22 @@ Puppet::Type.newtype(:file_concat) do
       content_fragments << ["#{r[:order]}___#{r[:name]}", fragment_content(r)]
     end
 
-    sorted = content_fragments.sort do |a, b|
-      def decompound(d)
-        d.split('___').map { |v| v =~ /^\d+$/ ? v.to_i : v }
-      end
+    if self[:order] == 'numeric'
+      sorted = content_fragments.sort do |a, b|
+        def decompound(d)
+          d.split('___').map { |v| v =~ /^\d+$/ ? v.to_i : v }
+        end
 
-      decompound(a[0]) <=> decompound(b[0])
+        decompound(a[0]) <=> decompound(b[0])
+      end
+    else
+      sorted = content_fragments.sort do |a, b|
+        def decompound(d)
+          d.split('___').first
+        end
+
+        decompound(a[0]) <=> decompound(b[0])
+      end
     end
 
     @generated_content = sorted.map { |cf| cf[1] }.join

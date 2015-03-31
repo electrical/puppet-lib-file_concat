@@ -80,7 +80,7 @@ Puppet::Type.newtype(:file_concat) do
 
     def insync?(is)
       result = super
-      string_file_diff(@resource[:path], @resource.should_content) if result
+      string_file_diff(@resource[:path], @resource.should_content) unless result
       result
     end
 

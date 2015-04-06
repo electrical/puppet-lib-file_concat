@@ -26,11 +26,8 @@ Puppet::Type.newtype(:file_concat) do
     defaultto { :present }
   end
 
-  # the file/posix provider will check for the :links property
-  # which does not exist
-  def [](value)
-    return false if value == :links
-    super
+  def exists?
+    self[:ensure] == :present
   end
 
   newparam(:name, :namevar => true) do
@@ -48,50 +45,19 @@ Puppet::Type.newtype(:file_concat) do
     end
   end
 
-  newproperty(:owner, :parent => Puppet::Type::File::Owner) do
+  newparam(:owner, :parent => Puppet::Type::File::Owner) do
     desc "Desired file owner."
     defaultto 'root'
   end
 
-  newproperty(:group, :parent => Puppet::Type::File::Group) do
+  newparam(:group, :parent => Puppet::Type::File::Group) do
     desc "Desired file group."
     defaultto 'root'
   end
 
-  newproperty(:mode, :parent => Puppet::Type::File::Mode) do
+  newparam(:mode, :parent => Puppet::Type::File::Mode) do
     desc "Desired file mode."
     defaultto '0644'
-  end
-
-  newproperty(:content) do
-    desc "Read only attribute. Represents the content."
-
-    include Puppet::Util::Diff
-    include Puppet::Util::Checksums
-
-    defaultto do
-      # only be executed if no :content is set
-      @content_default = true
-      @resource.no_content
-    end
-
-    validate do |val|
-      fail "read-only attribute" unless @content_default
-    end
-
-    def insync?(is)
-      result = super
-      string_file_diff(@resource[:path], @resource.should_content) unless result
-      result
-    end
-
-    def is_to_s(value)
-      md5(value)
-    end
-
-    def should_to_s(value)
-      md5(value)
-    end
   end
 
   newparam(:order) do
@@ -111,10 +77,6 @@ Puppet::Type.newtype(:file_concat) do
 
   newparam(:validate_cmd) do
     desc "Validates file."
-  end
-
-  def no_content
-    "\0PLEASE_MANAGE_THIS_WITH_FILE_CONCAT\0"
   end
 
   def should_content
@@ -163,29 +125,14 @@ Puppet::Type.newtype(:file_concat) do
     fragment_content
   end
 
-  def stat(*)
-    return @stat if @stat && !@stat == :needs_stat
-    @stat = begin
-      ::File.stat(self[:path])
-    rescue Errno::ENOENT
-      nil
-    rescue Errno::EACCES
-      warning "Could not stat; permission denied"
-      nil
-    end
-  end
-
-  ### took from original type/file
-  # There are some cases where all of the work does not get done on
-  # file creation/modification, so we have to do some extra checking.
-  def property_fix
-    properties.each do |thing|
-      next unless [:mode, :owner, :group].include?(thing.name)
-
-      # Make sure we get a new stat object
-      @stat = :needs_stat
-      currentvalue = thing.retrieve
-      thing.sync unless thing.safe_insync?(currentvalue)
-    end
+  def generate
+    Puppet::Type.type(:file).new({
+      :ensure  => self[:ensure] == :absent ? :absent : :file,
+      :path    => self[:path],
+      :owner   => self[:owner],
+      :group   => self[:group],
+      :replace => self[:replace],
+      :content => self.should_content,
+    })
   end
 end

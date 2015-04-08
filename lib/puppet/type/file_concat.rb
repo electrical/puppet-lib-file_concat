@@ -2,7 +2,6 @@ require 'puppet/type/file/owner'
 require 'puppet/type/file/group'
 require 'puppet/type/file/mode'
 require 'puppet/util/checksums'
-require 'puppet/type/file/source'
 
 Puppet::Type.newtype(:file_concat) do
   @doc = "Gets all the file fragments and puts these into the target file.
@@ -79,6 +78,14 @@ Puppet::Type.newtype(:file_concat) do
     desc "Validates file."
   end
 
+  autorequire(:file_fragment) do
+    catalog.resources.collect do |r|
+      if r.is_a?(Puppet::Type.type(:file_fragment)) && r[:tag] == self[:tag]
+        r.name
+      end
+    end.compact
+  end
+
   def should_content
     return @generated_content if @generated_content
     @generated_content = ""
@@ -119,14 +126,19 @@ Puppet::Type.newtype(:file_concat) do
     if r[:content].nil? == false
       fragment_content = r[:content]
     elsif r[:source].nil? == false
-      tmp = Puppet::FileServing::Content.indirection.find(r[:source], :environment => catalog.environment)
+      @source = nil
+      Array(r[:source]).each do |source|
+        @source = source if Puppet::FileServing::Metadata.indirection.find(source)
+      end
+      self.fail "Could not retrieve source(s) #{r[:source].join(", ")}" unless @source
+      tmp = Puppet::FileServing::Content.indirection.find(@source, :environment => catalog.environment)
       fragment_content = tmp.content unless tmp.nil?
     end
     fragment_content
   end
 
-  def generate
-    Puppet::Type.type(:file).new({
+  def eval_generate
+    [Puppet::Type.type(:file).new({
       :ensure  => self[:ensure] == :absent ? :absent : :file,
       :path    => self[:path],
       :owner   => self[:owner],
@@ -135,6 +147,6 @@ Puppet::Type.newtype(:file_concat) do
       :replace => self[:replace],
       :backup  => self[:backup],
       :content => self.should_content,
-    })
+    })]
   end
 end

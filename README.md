@@ -20,8 +20,8 @@ Creates a file fragment to be collected by file_concat based on the tag.
 Example with exported resource:
 
     @@file_fragment { "uniqe_name_${::fqdn}":
-      tag     => 'unique_tag',            # Mandatory
-      order   => 10,                      # Optional. Default to 10
+      tag     => 'unique_tag',            # Mandatory.
+      order   => 10,                      # Optional. Defaults to 10.
       content => 'some content'           # OR
       content => template('template.erb') # OR
       source  => 'puppet:///path/to/file'
@@ -37,11 +37,14 @@ example:
     File_fragment <<| tag == 'unique_tag' |>>
 
     file_concat { '/tmp/file':
-      tag   => 'unique_tag', # Mandatory
-      path  => '/tmp/file',  # Optional. If given it overrides the resource name
-      owner => 'root',       # Optional. Default to root
-      group => 'root',       # Optional. Default to root
-      mode  => '0644'        # Optional. Default to 0644
+      tag     => 'unique_tag', # Mandatory
+      path    => '/tmp/file',  # Optional. If given it overrides the resource name.
+      owner   => 'root',       # Optional. Defaults to root.
+      group   => 'root',       # Optional. Defaults to root.
+      mode    => '0644'        # Optional. Defaults to 0644.
+      order   => 'numeric'     # Optional. Set to 'numeric' or 'alpha'. Defaults to numeric.
+      replace => true          # Optional. Boolean Value. Defaults to true.
+      backup  => false         # Optional. true, false, 'puppet', or a string. Defaults to 'puppet' for Filebucketing.
     }
 
 ## Limitations

@@ -131,6 +131,7 @@ Puppet::Type.newtype(:file_concat) do
       :path    => self[:path],
       :owner   => self[:owner],
       :group   => self[:group],
+      :mode    => self[:mode],
       :replace => self[:replace],
       :backup  => self[:backup],
       :content => self.should_content,

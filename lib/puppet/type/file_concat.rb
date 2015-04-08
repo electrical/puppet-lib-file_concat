@@ -79,6 +79,14 @@ Puppet::Type.newtype(:file_concat) do
     desc "Validates file."
   end
 
+  autorequire(:file_fragment) do
+    catalog.resources.collect do |r|
+      if r.is_a?(Puppet::Type.type(:file_fragment)) && r[:tag] == self[:tag]
+        r.name
+      end
+    end.compact
+  end
+
   def should_content
     return @generated_content if @generated_content
     @generated_content = ""

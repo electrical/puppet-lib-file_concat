@@ -128,7 +128,10 @@ Puppet::Type.newtype(:file_concat) do
     elsif r[:source].nil? == false
       @source = nil
       Array(r[:source]).each do |source|
-        @source = source if Puppet::FileServing::Metadata.indirection.find(source)
+        if Puppet::FileServing::Metadata.indirection.find(source)
+          @source = source 
+          break
+        end
       end
       self.fail "Could not retrieve source(s) #{r[:source].join(", ")}" unless @source
       tmp = Puppet::FileServing::Content.indirection.find(@source, :environment => catalog.environment)

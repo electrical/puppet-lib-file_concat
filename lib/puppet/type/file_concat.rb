@@ -13,9 +13,9 @@ Puppet::Type.newtype(:file_concat) do
       file_concat { '/tmp/file:
         tag   => 'unique_tag', # Mandatory
         path  => '/tmp/file',  # Optional. If given it overrides the resource name
-        owner => 'root',       # Optional. Default to root
-        group => 'root',       # Optional. Default to root
-        mode  => '0644'        # Optional. Default to 0644
+        owner => 'root',       # Optional. Default to undef
+        group => 'root',       # Optional. Default to undef
+        mode  => '0644'        # Optional. Default to undef
         order => 'numeric'     # Optional, Default to 'numeric'
       }
   "
@@ -46,17 +46,14 @@ Puppet::Type.newtype(:file_concat) do
 
   newparam(:owner, :parent => Puppet::Type::File::Owner) do
     desc "Desired file owner."
-    defaultto 'root'
   end
 
   newparam(:group, :parent => Puppet::Type::File::Group) do
     desc "Desired file group."
-    defaultto 'root'
   end
 
   newparam(:mode, :parent => Puppet::Type::File::Mode) do
     desc "Desired file mode."
-    defaultto '0644'
   end
 
   newparam(:order) do
@@ -141,15 +138,17 @@ Puppet::Type.newtype(:file_concat) do
   end
 
   def eval_generate
-    [Puppet::Type.type(:file).new({
-      :ensure  => self[:ensure] == :absent ? :absent : :file,
-      :path    => self[:path],
-      :owner   => self[:owner],
-      :group   => self[:group],
-      :mode    => self[:mode],
-      :replace => self[:replace],
-      :backup  => self[:backup],
+    file_opts = {
+      :ensure => self[:ensure] == :absent ? :absent : :file,
       :content => self.should_content,
-    })]
+    }
+
+    [:path, :owner, :group, :mode, :replace, :backup].each do |param|
+      unless self[param].nil?
+        file_opts[param] = self[param]
+      end
+    end
+
+    [Puppet::Type.type(:file).new(file_opts)]
   end
 end

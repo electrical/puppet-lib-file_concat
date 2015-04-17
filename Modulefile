@@ -1,5 +1,5 @@
 name    'electrical-file_concat'
-version '1.0.0'
+version '1.0.1'
 source 'https://github.com/electrical/puppet-lib-file_concat'
 author 'electrical'
 license 'Apache License, Version 2.0'

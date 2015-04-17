@@ -1,3 +1,20 @@
+##1.0.1 ( Apr 17, 2015 )
+
+###Summary
+Bugfix release
+
+####Features
+
+####Bugfixes
+* Fix windows support by not defaulting owner,group and mode values
+
+####Changes
+
+####Testing changes
+
+####Known bugs
+
+
 ##1.0.0 ( Apr 09, 2015 )
 
 ###Summary

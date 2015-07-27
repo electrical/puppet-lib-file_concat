@@ -185,6 +185,56 @@ describe "File Concat" do
         it { should be_grouped_into 'nobody' }
         it { should be_mode 755 }
       end
+
+    end
+
+  end
+
+  describe "notify resource" do
+
+    describe "first run" do
+      it 'should run successfully' do
+        pp = "
+              file_fragment { 'fragment_1': source => 'puppet:///modules/another/file1', tag => 'mytag' }
+              file_concat { 'myfile': tag => 'mytag', path => '/tmp/concat', notify => Exec['echo_foobar'] }
+              exec { 'echo_foobar': command => '/bin/echo foobar >> /tmp/foobar', refreshonly => true }
+             "
+        apply_manifest(pp, :catch_failures => true)
+        expect(apply_manifest(pp, :catch_failures => true).exit_code).to be_zero
+
+      end
+
+      describe file('/tmp/concat') do
+        it { should be_file }
+      end
+
+      describe file('/tmp/foobar') do
+        it { should_not be_file }
+      end
+
+    end
+
+    describe "second run" do
+      it 'should run successfully' do
+        pp = "
+              file_fragment { 'fragment_1': source => 'puppet:///modules/another/file2', tag => 'mytag' }
+              file_concat { 'myfile': tag => 'mytag', path => '/tmp/concat'}
+              exec { 'echo_foobar': command => '/bin/echo bar >> /tmp/foobar', refreshonly => true, subscribe => File_concat['myfile'] }
+             "
+        apply_manifest(pp, :catch_failures => true)
+        expect(apply_manifest(pp, :catch_failures => true).exit_code).to be_zero
+
+      end
+
+      describe file('/tmp/concat') do
+        it { should be_file }
+      end
+
+      describe file('/tmp/foobar') do
+        it { should be_file }
+        its(:content) { should match /bar/ }
+      end
+
     end
 
   end

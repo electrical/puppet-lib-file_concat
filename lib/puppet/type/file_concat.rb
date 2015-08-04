@@ -149,10 +149,11 @@ Puppet::Type.newtype(:file_concat) do
   end
 
   def eval_generate
-    file_opts = {
-      :ensure => self[:ensure] == :absent ? :absent : :file,
-      :content => self.should_content,
-    }
+    content = self.should_content
+
+    file_opts = {}
+    file_opts[:ensure] = self[:ensure] == :absent ? :absent : :file
+    file_opts[:content] = content if !content.nil? and !content.empty?
 
     [:path, :owner, :group, :mode, :replace, :backup].each do |param|
       unless self[param].nil?

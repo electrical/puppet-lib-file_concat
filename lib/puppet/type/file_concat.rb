@@ -81,6 +81,10 @@ Puppet::Type.newtype(:file_concat) do
     defaultto false
   end
 
+  autorequire(:file) do
+    [self[:path]]
+  end
+
   autorequire(:file_fragment) do
     catalog.resources.collect do |r|
       if r.is_a?(Puppet::Type.type(:file_fragment)) && r[:tag] == self[:tag]

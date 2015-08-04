@@ -11,12 +11,13 @@ Puppet::Type.newtype(:file_concat) do
       File_fragment <<| tag == 'unique_tag' |>>
 
       file_concat { '/tmp/file:
-        tag   => 'unique_tag', # Mandatory
-        path  => '/tmp/file',  # Optional. If given it overrides the resource name
-        owner => 'root',       # Optional. Default to undef
-        group => 'root',       # Optional. Default to undef
-        mode  => '0644'        # Optional. Default to undef
-        order => 'numeric'     # Optional, Default to 'numeric'
+        tag            => 'unique_tag', # Mandatory
+        path           => '/tmp/file',  # Optional. If given it overrides the resource name
+        owner          => 'root',       # Optional. Default to undef
+        group          => 'root',       # Optional. Default to undef
+        mode           => '0644',       # Optional. Default to undef
+        order          => 'numeric',    # Optional, Default to 'numeric'
+        ensure_newline => false,        # Optional, Defaults to false
       }
   "
   ensurable do
@@ -73,6 +74,11 @@ Puppet::Type.newtype(:file_concat) do
 
   newparam(:validate_cmd) do
     desc "Validates file."
+  end
+
+  newparam(:ensure_newline) do
+    desc "Whether to ensure there is a newline after each fragment."
+    defaultto false
   end
 
   autorequire(:file_fragment) do
@@ -134,6 +140,11 @@ Puppet::Type.newtype(:file_concat) do
       tmp = Puppet::FileServing::Content.indirection.find(@source, :environment => catalog.environment)
       fragment_content = tmp.content unless tmp.nil?
     end
+
+    if self[:ensure_newline]
+      fragment_content << "\n" unless fragment_content =~ /\n$/
+    end
+
     fragment_content
   end
 

@@ -11,12 +11,13 @@ Puppet::Type.newtype(:file_concat) do
       File_fragment <<| tag == 'unique_tag' |>>
 
       file_concat { '/tmp/file:
-        tag   => 'unique_tag', # Mandatory
-        path  => '/tmp/file',  # Optional. If given it overrides the resource name
-        owner => 'root',       # Optional. Default to undef
-        group => 'root',       # Optional. Default to undef
-        mode  => '0644'        # Optional. Default to undef
-        order => 'numeric'     # Optional, Default to 'numeric'
+        tag            => 'unique_tag', # Mandatory
+        path           => '/tmp/file',  # Optional. If given it overrides the resource name
+        owner          => 'root',       # Optional. Default to undef
+        group          => 'root',       # Optional. Default to undef
+        mode           => '0644',       # Optional. Default to undef
+        order          => 'numeric',    # Optional, Default to 'numeric'
+        ensure_newline => false,        # Optional, Defaults to false
       }
   "
   ensurable do
@@ -73,6 +74,15 @@ Puppet::Type.newtype(:file_concat) do
 
   newparam(:validate_cmd) do
     desc "Validates file."
+  end
+
+  newparam(:ensure_newline) do
+    desc "Whether to ensure there is a newline after each fragment."
+    defaultto false
+  end
+
+  autorequire(:file) do
+    [self[:path]]
   end
 
   autorequire(:file_fragment) do
@@ -134,14 +144,20 @@ Puppet::Type.newtype(:file_concat) do
       tmp = Puppet::FileServing::Content.indirection.find(@source, :environment => catalog.environment)
       fragment_content = tmp.content unless tmp.nil?
     end
+
+    if self[:ensure_newline]
+      fragment_content << "\n" unless fragment_content =~ /\n$/
+    end
+
     fragment_content
   end
 
   def eval_generate
-    file_opts = {
-      :ensure => self[:ensure] == :absent ? :absent : :file,
-      :content => self.should_content,
-    }
+    content = self.should_content
+
+    file_opts = {}
+    file_opts[:ensure] = self[:ensure] == :absent ? :absent : :file
+    file_opts[:content] = content if !content.nil? and !content.empty?
 
     [:path, :owner, :group, :mode, :replace, :backup].each do |param|
       unless self[param].nil?

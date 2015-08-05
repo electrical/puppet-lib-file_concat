@@ -37,17 +37,41 @@ example:
     File_fragment <<| tag == 'unique_tag' |>>
 
     file_concat { '/tmp/file':
-      tag     => 'unique_tag', # Mandatory
-      path    => '/tmp/file',  # Optional. If given it overrides the resource name.
-      owner   => 'root',       # Optional. Defaults to undef.
-      group   => 'root',       # Optional. Defaults to undef.
-      mode    => '0644'        # Optional. Defaults to undef.
-      order   => 'numeric'     # Optional. Set to 'numeric' or 'alpha'. Defaults to numeric.
-      replace => true          # Optional. Boolean Value. Defaults to true.
-      backup  => false         # Optional. true, false, 'puppet', or a string. Defaults to 'puppet' for Filebucketing.
+      tag            => 'unique_tag', # Mandatory
+      path           => '/tmp/file',  # Optional. If given it overrides the resource name.
+      owner          => 'root',       # Optional. Defaults to undef.
+      group          => 'root',       # Optional. Defaults to undef.
+      mode           => '0644',       # Optional. Defaults to undef.
+      order          => 'numeric',    # Optional. Set to 'numeric' or 'alpha'. Defaults to numeric.
+      replace        => true,         # Optional. Boolean Value. Defaults to true.
+      backup         => false,        # Optional. true, false, 'puppet', or a string. Defaults to 'puppet' for Filebucketing.
+      ensure_newline => false,        # Optional. Boolean Value. Defaults to false.
     }
 
 ## Limitations
+
+A bug where module will be unable to build correct dependency graph if the manifest contains a resource to recursively purge a parent directory.
+
+Example: [MODULES-2054](https://tickets.puppetlabs.com/browse/MODULES-2054)
+~~~
+file { '/tmp/bug':
+  ensure  => directory,
+  purge   => true,
+  recurse => true,
+  force   => true
+}
+ 
+file_concat { 'test' :
+  path    => '/tmp/bug/tester',
+  tag     => 'mytag',
+  require => File['/tmp/bug']
+}
+ 
+file_fragment { 'test-1':
+  tag     => 'mytag',
+  content => 'test'
+}
+~~~
 
 ## Development
 

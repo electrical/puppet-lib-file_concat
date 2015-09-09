@@ -140,7 +140,7 @@ Puppet::Type.newtype(:file_concat) do
           break
         end
       end
-      self.fail "Could not retrieve source(s) #{r[:source].join(", ")}" unless @source
+      self.fail "Could not retrieve source(s) #{Array(r[:source]).join(", ")}" unless @source
       tmp = Puppet::FileServing::Content.indirection.find(@source, :environment => catalog.environment)
       fragment_content = tmp.content unless tmp.nil?
     end

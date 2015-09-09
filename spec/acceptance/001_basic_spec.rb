@@ -126,7 +126,7 @@ describe "File Concat" do
 
     end
 
-    describe "non existing fragment" do
+    describe "non existing fragment keeps original result" do
       it 'should run successfully' do
         pp = "
               file_fragment { 'fragment_1': source => 'puppet:///modules/another/file3', tag => 'mytag' }
@@ -139,7 +139,7 @@ describe "File Concat" do
 
       describe file('/tmp/concat') do
         it { should be_file }
-        its(:content) { should match // }
+        its(:content) { should match /contentfile1\ncontentfile2/ }
       end
     end
    

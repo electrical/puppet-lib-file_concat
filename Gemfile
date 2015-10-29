@@ -3,10 +3,10 @@ source 'https://rubygems.org'
 puppetversion = ENV['PUPPET_VERSION'] || '~> 3.8.0'
 gem 'puppet', puppetversion, :require => false
 
-gem 'beaker'
+gem 'beaker', '2.27.0'
 gem 'beaker-rspec'
 gem 'metadata-json-lint'
-gem 'rspec-puppet', :git => 'https://github.com/rodjek/rspec-puppet.git', :branch => 'master'
+gem 'rspec-puppet', '2.2.0'
 
 gem 'pry'
 gem 'docker-api', '~> 1.0'

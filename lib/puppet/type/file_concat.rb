@@ -1,6 +1,3 @@
-require 'puppet/type/file/owner'
-require 'puppet/type/file/group'
-require 'puppet/type/file/mode'
 require 'puppet/util/checksums'
 
 Puppet::Type.newtype(:file_concat) do
@@ -45,15 +42,15 @@ Puppet::Type.newtype(:file_concat) do
     end
   end
 
-  newparam(:owner, :parent => Puppet::Type::File::Owner) do
+  newparam(:owner) do
     desc "Desired file owner."
   end
 
-  newparam(:group, :parent => Puppet::Type::File::Group) do
+  newparam(:group) do
     desc "Desired file group."
   end
 
-  newparam(:mode, :parent => Puppet::Type::File::Mode) do
+  newparam(:mode) do
     desc "Desired file mode."
   end
 

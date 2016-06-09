@@ -50,28 +50,5 @@ example:
 
 ## Limitations
 
-A bug where module will be unable to build correct dependency graph if the manifest contains a resource to recursively purge a parent directory.
-
-Example: [MODULES-2054](https://tickets.puppetlabs.com/browse/MODULES-2054)
-~~~
-file { '/tmp/bug':
-  ensure  => directory,
-  purge   => true,
-  recurse => true,
-  force   => true
-}
- 
-file_concat { 'test' :
-  path    => '/tmp/bug/tester',
-  tag     => 'mytag',
-  require => File['/tmp/bug']
-}
- 
-file_fragment { 'test-1':
-  tag     => 'mytag',
-  content => 'test'
-}
-~~~
-
 ## Development
 

@@ -112,12 +112,9 @@ Puppet::Type.newtype(:file_concat) do
         decompound(a[0]) <=> decompound(b[0])
       end
     else
-      sorted = content_fragments.sort do |a, b|
-        def decompound(d)
-          d.split('___').first
-        end
-
-        decompound(a[0]) <=> decompound(b[0])
+      sorted = content_fragments.sort_by do |a|
+        a_order, a_name = a[0].split('__')
+        [a_order, a_name]
       end
     end
 
@@ -149,19 +146,39 @@ Puppet::Type.newtype(:file_concat) do
     fragment_content
   end
 
-  def eval_generate
-    content = self.should_content
+  def generate
+    file_opts = {
+      :ensure => self[:ensure] == :absent ? :absent : :file,
+    }
 
-    file_opts = {}
-    file_opts[:ensure] = self[:ensure] == :absent ? :absent : :file
-    file_opts[:content] = content if !content.nil? and !content.empty?
+    [:path,
+     :owner,
+     :group,
+     :mode,
+     :replace,
+     :backup,
+     :validate_cmd,
+    end
 
-    [:path, :owner, :group, :mode, :replace, :backup].each do |param|
-      unless self[param].nil?
-        file_opts[param] = self[param]
-      end
+    metaparams = Puppet::Type.metaparams
+    excluded_metaparams = [ :before, :notify, :require, :subscribe, :tag ]
+
+    metaparams.reject! { |param| excluded_metaparams.include? param }
+
+    metaparams.each do |metaparam|
+      file_opts[metaparam] = self[metaparam] if self[metaparam]
     end
 
     [Puppet::Type.type(:file).new(file_opts)]
+  end
+
+  def eval_generate
+    content = self.should_content
+
+    if !content.nil? and !content.empty?
+      catalog.resource("File[#{self[:path]}]")[:content] = content
+    end
+
+    [ catalog.resource("File[#{self[:path]}]") ]
   end
 end
